@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>S & E Data System</title>
+    <title>SME Data System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script type="text/javascript" src="/eel.js"></script>
     <style>
-        :root { --primary: #4a90e2; --success: #2ecc71; --danger: #ff4757; --dark: #2c3e50; }
+        :root { --primary: #4a90e2; --success: #2ecc71; --danger: #ff4757; --dark: #2c3e50; --light: #f8f9fa; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -18,40 +18,13 @@
 
         .main-container { display: flex; gap: 20px; width: 100%; max-width: 1200px; height: 750px; }
 
-        /* --- TOOLTIP STYLES (NEW) --- */
+        /* --- TOOLTIPS --- */
         [data-tooltip] { position: relative; cursor: pointer; }
         [data-tooltip]:hover::after {
             content: attr(data-tooltip);
-            position: absolute;
-            bottom: 110%; /* Shows above the element */
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            animation: fadeIn 0.2s forwards;
+            position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+            background: #333; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; white-space: nowrap; z-index: 1000; opacity: 0; pointer-events: none;
         }
-        [data-tooltip]:hover::before {
-            /* Small arrow pointing down */
-            content: '';
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 6px;
-            border-style: solid;
-            border-color: #333 transparent transparent transparent;
-            opacity: 0;
-            animation: fadeIn 0.2s forwards;
-        }
-        @keyframes fadeIn { to { opacity: 1; transform: translateX(-50%) translateY(-5px); } }
 
         /* --- LEFT: FORM --- */
         .card-form {
@@ -70,9 +43,18 @@
         button.cancel-btn { width: 100%; padding: 10px; background: #95a5a6; color: white; border: none; border-radius: 8px; margin-top: 10px; display: none; cursor: pointer; }
 
         /* --- RIGHT: DATA PANEL --- */
-        .data-panel { flex: 1; background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 25px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        .data-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
 
-        .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
         .header-title { display: flex; align-items: center; gap: 15px; }
         .header-title img { width: 50px; height: 50px; border-radius: 50%; }
         .header-title h2 { margin: 0; color: #333; font-size: 24px; }
@@ -84,30 +66,62 @@
         .view-toggles button { background: none; border: none; font-size: 18px; color: #aaa; cursor: pointer; margin-left: 10px; }
         .view-toggles button.active { color: var(--primary); }
 
-        .content-area { flex: 1; overflow-y: auto; padding: 5px; }
+        /* CONTENT AREA (Auto Scroll) */
+        .content-area {
+            flex: 1; /* Takes all available space */
+            overflow-y: auto;
+            padding: 5px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 10px; /* Space for pagination */
+        }
 
-        /* LIST & GRID STYLES */
+        /* --- TABLE STYLES (Zebra Pattern) --- */
         table { width: 100%; border-collapse: collapse; display: none; }
-        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; position: sticky; top: 0; font-weight: 600; color: #555; }
-        tr:hover { background-color: #f1f7ff; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: var(--primary); color: white; position: sticky; top: 0; font-weight: 600; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; }
 
+        /* Zebra Striping Logic */
+        tbody tr:nth-child(even) { background-color: #f8f9fa; }
+        tbody tr:nth-child(odd) { background-color: #ffffff; }
+        tbody tr:hover { background-color: #e9ecef; transition: 0.2s; }
+
+        /* --- GRID STYLES --- */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
         .student-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: left; border: 1px solid #eee; transition: 0.2s; position: relative; }
         .student-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: var(--primary); }
-
         .card-initial { float: left; width: 45px; height: 45px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; margin-right: 15px; }
         .student-card h3 { margin: 0 0 5px 0; font-size: 18px; color: #333; }
         .student-card .detail { font-size: 13px; color: #666; margin-bottom: 3px; }
         .card-actions { margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; display: flex; justify-content: flex-end; gap: 8px; }
 
+        /* VIEW TOGGLE LOGIC */
         .show-list .grid-container { display: none; }
         .show-list table { display: table; }
         .show-grid table { display: none; }
         .show-grid .grid-container { display: grid; }
 
-        .btn-edit { background: #f39c12; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
-        .btn-delete { background: #ff4757; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+        .btn-edit { background: #f39c12; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-delete { background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+        /* --- PAGINATION BAR (Always Visible) --- */
+        .pagination-bar {
+            height: 40px; /* Fixed height */
+            background: #fff;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+        }
+        .pagination-info { font-size: 13px; color: #666; font-weight: 500; }
+        .page-btn {
+            background: #f1f1f1; border: 1px solid #ddd; padding: 6px 14px; border-radius: 4px; cursor: pointer; transition: 0.2s; color: #555;
+        }
+        .page-btn:hover { background: #e2e6ea; }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
     </style>
 </head>
 <body>
@@ -116,74 +130,67 @@
 
     <div class="card-form">
         <div class="form-logo">
-            <img src="logo.png" onerror="this.src='https://via.placeholder.com/80?text=S+E'">
+            <img src="logo.png" onerror="this.src='https://via.placeholder.com/80?text=SME'">
         </div>
         <h2 id="formTitle">Register</h2>
 
         <input type="hidden" id="studentId">
 
-        <div class="input-group" data-tooltip="Enter First Name">
-            <i class="fa fa-user"></i>
-            <input type="text" id="fName" placeholder="First Name">
-        </div>
+        <div class="input-group" data-tooltip="Enter First Name"><i class="fa fa-user"></i><input type="text" id="fName" placeholder="First Name"></div>
+        <div class="input-group" data-tooltip="Enter Last Name"><i class="fa fa-user-tag"></i><input type="text" id="sName" placeholder="Second Name"></div>
+        <div class="input-group" data-tooltip="e.g., Computer Science"><i class="fa fa-book"></i><input type="text" id="course" placeholder="Course"></div>
+        <div class="input-group" data-tooltip="Numbers only"><i class="fa fa-phone"></i><input type="tel" id="phone" placeholder="Phone Number"></div>
+        <div class="input-group" data-tooltip="Assigned Hostel Room"><i class="fa fa-door-open"></i><input type="text" id="room" placeholder="Room No"></div>
 
-        <div class="input-group" data-tooltip="Enter Last Name">
-            <i class="fa fa-user-tag"></i>
-            <input type="text" id="sName" placeholder="Second Name">
-        </div>
-
-        <div class="input-group" data-tooltip="e.g., Computer Science">
-            <i class="fa fa-book"></i>
-            <input type="text" id="course" placeholder="Course">
-        </div>
-
-        <div class="input-group" data-tooltip="Numbers only">
-            <i class="fa fa-phone"></i>
-            <input type="tel" id="phone" placeholder="Phone Number">
-        </div>
-
-        <div class="input-group" data-tooltip="Assigned Hostel Room">
-            <i class="fa fa-door-open"></i>
-            <input type="text" id="room" placeholder="Room No">
-        </div>
-
-        <button class="save-btn" id="saveBtn" onclick="saveData()" data-tooltip="Save details to database">
-            <i class="fa fa-save"></i> Save Student
-        </button>
+        <button class="save-btn" id="saveBtn" onclick="saveData()" data-tooltip="Save details"><i class="fa fa-save"></i> Save Student</button>
         <button class="cancel-btn" id="cancelBtn" onclick="resetForm()">Cancel</button>
     </div>
 
     <div class="data-panel">
         <div class="panel-header">
             <div class="header-title">
-                <img src="logo.png" onerror="this.src='https://via.placeholder.com/50?text=Logo'">
+                <img src="logo.png" onerror="this.src='https://via.placeholder.com/50?text=SME'">
                 <h2>Database Records</h2>
             </div>
         </div>
 
         <div class="toolbar">
-            <div class="search-box" data-tooltip="Filter by Name, Course or Room">
+            <div class="search-box">
                 <i class="fa fa-search input-group i" style="left:10px; top:8px; position:absolute;"></i>
                 <input type="text" id="searchInput" placeholder="Search records..." onkeyup="loadData()">
             </div>
             <div class="view-toggles">
-                <button onclick="setView('grid')" id="btnGrid" class="active" data-tooltip="Grid View"><i class="fa fa-th-large"></i></button>
-                <button onclick="setView('list')" id="btnList" data-tooltip="List View"><i class="fa fa-list"></i></button>
+                <button onclick="setView('grid')" id="btnGrid" data-tooltip="Grid View"><i class="fa fa-th-large"></i></button>
+                <button onclick="setView('list')" id="btnList" class="active" data-tooltip="List View"><i class="fa fa-list"></i></button>
             </div>
         </div>
 
-        <div id="contentArea" class="content-area show-grid">
+        <div id="contentArea" class="content-area show-list">
             <div class="grid-container" id="gridContainer"></div>
+
             <table id="listTable">
                 <thead><tr><th>Name</th><th>Course</th><th>Phone</th><th>Room</th><th>Actions</th></tr></thead>
                 <tbody id="listBody"></tbody>
             </table>
         </div>
+
+        <div class="pagination-bar">
+            <div class="pagination-info" id="pageInfo">Loading...</div>
+            <div style="display:flex; gap:5px;">
+                <button class="page-btn" onclick="changePage(-1)" id="btnPrev"><i class="fa fa-chevron-left"></i> Prev</button>
+                <button class="page-btn" onclick="changePage(1)" id="btnNext">Next <i class="fa fa-chevron-right"></i></button>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
-    let currentView = 'grid';
+    // --- STATE ---
+    let currentView = 'list'; // Default is List
+    let allStudents = [];
+    let currentPage = 1;
+    const itemsPerPage = 8; // Adjust to fit your screen
 
     window.onload = function() { loadData(); }
 
@@ -195,26 +202,101 @@
         container.className = `content-area show-${view}`;
     }
 
+    function renderPage() {
+        const grid = document.getElementById('gridContainer');
+        const listBody = document.getElementById('listBody');
+        const pageInfo = document.getElementById('pageInfo');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+
+        grid.innerHTML = '';
+        listBody.innerHTML = '';
+
+        const totalItems = allStudents.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        if (currentPage < 1) currentPage = 1;
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageItems = allStudents.slice(start, end);
+
+        if (totalItems === 0) {
+            pageInfo.innerText = "No records found";
+            btnPrev.disabled = true;
+            btnNext.disabled = true;
+            return;
+        } else {
+            pageInfo.innerText = `Page ${currentPage} of ${totalPages} (Total: ${totalItems})`;
+        }
+
+        btnPrev.disabled = (currentPage === 1);
+        btnNext.disabled = (currentPage === totalPages);
+
+        pageItems.forEach(s => {
+            const initial = s.fName.charAt(0).toUpperCase();
+
+            // Grid View
+            grid.innerHTML += `
+                <div class="student-card">
+                    <div class="card-initial">${initial}</div>
+                    <h3>${s.fName} ${s.sName}</h3>
+                    <div class="detail"><i class="fa fa-book"></i> ${s.course}</div>
+                    <div class="detail"><i class="fa fa-phone"></i> ${s.phone}</div>
+                    <div class="detail"><i class="fa fa-door-open"></i> Room: ${s.room}</div>
+                    <div class="card-actions">
+                        <button class="btn-edit" onclick="editItem('${s.id}', '${s.fName}', '${s.sName}', '${s.course}', '${s.phone}', '${s.room}')">Edit</button>
+                        <button class="btn-delete" onclick="deleteItem('${s.id}')">Delete</button>
+                    </div>
+                </div>
+            `;
+
+            // List View
+            listBody.innerHTML += `
+                <tr>
+                    <td><b>${s.fName}</b> ${s.sName}</td>
+                    <td>${s.course}</td>
+                    <td>${s.phone}</td>
+                    <td>${s.room}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editItem('${s.id}', '${s.fName}', '${s.sName}', '${s.course}', '${s.phone}', '${s.room}')"><i class="fa fa-edit"></i></button>
+                        <button class="btn-delete" onclick="deleteItem('${s.id}')"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function changePage(direction) {
+        currentPage += direction;
+        renderPage();
+    }
+
+    async function loadData() {
+        const query = document.getElementById('searchInput').value;
+        allStudents = await eel.get_students(query)();
+        currentPage = 1;
+        renderPage();
+    }
+
     async function saveData() {
-        // Collect Data
         const idVal = document.getElementById('studentId').value;
         const fName = document.getElementById('fName').value;
         const sName = document.getElementById('sName').value;
         const course = document.getElementById('course').value;
         const phone = document.getElementById('phone').value;
         const room = document.getElementById('room').value;
-
         const data = { id: idVal, fName: fName, sName: sName, course: course, phone: phone, room: room };
 
         if(!fName || !phone) { alert("Name and Phone required!"); return; }
 
         const btn = document.getElementById('saveBtn');
         const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
+        btn.innerHTML = 'Saving...';
         btn.disabled = true;
 
         try {
-            // FIXED: Using double parenthesis
             let result = await eel.save_student(data)();
             if(result.status === 'success') {
                 resetForm();
@@ -230,50 +312,6 @@
         btn.disabled = false;
     }
 
-    async function loadData() {
-        const query = document.getElementById('searchInput').value;
-        const students = await eel.get_students(query)();
-
-        const grid = document.getElementById('gridContainer');
-        const listBody = document.getElementById('listBody');
-
-        grid.innerHTML = '';
-        listBody.innerHTML = '';
-
-        students.forEach(s => {
-            const initial = s.fName.charAt(0).toUpperCase();
-
-            // 1. Grid Card (Added Tooltips to Buttons)
-            grid.innerHTML += `
-                <div class="student-card">
-                    <div class="card-initial">${initial}</div>
-                    <h3>${s.fName} ${s.sName}</h3>
-                    <div class="detail"><i class="fa fa-book"></i> ${s.course}</div>
-                    <div class="detail"><i class="fa fa-phone"></i> ${s.phone}</div>
-                    <div class="detail"><i class="fa fa-door-open"></i> Room: ${s.room}</div>
-                    <div class="card-actions">
-                        <button class="btn-edit" data-tooltip="Edit ${s.fName}" onclick="editItem('${s.id}', '${s.fName}', '${s.sName}', '${s.course}', '${s.phone}', '${s.room}')"><i class="fa fa-edit"></i> Edit</button>
-                        <button class="btn-delete" data-tooltip="Delete Record" onclick="deleteItem('${s.id}')"><i class="fa fa-trash"></i></button>
-                    </div>
-                </div>
-            `;
-
-            // 2. List Row (Added Tooltips to Buttons)
-            listBody.innerHTML += `
-                <tr>
-                    <td><b>${s.fName}</b> ${s.sName}</td>
-                    <td>${s.course}</td>
-                    <td>${s.phone}</td>
-                    <td>${s.room}</td>
-                    <td>
-                        <button class="btn-edit" data-tooltip="Edit" onclick="editItem('${s.id}', '${s.fName}', '${s.sName}', '${s.course}', '${s.phone}', '${s.room}')"><i class="fa fa-edit"></i></button>
-                        <button class="btn-delete" data-tooltip="Delete" onclick="deleteItem('${s.id}')"><i class="fa fa-trash"></i></button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
     function editItem(id, fName, sName, course, phone, room) {
         document.getElementById('studentId').value = id;
         document.getElementById('fName').value = fName;
@@ -283,7 +321,7 @@
         document.getElementById('room').value = room;
 
         document.getElementById('formTitle').innerText = "Edit Student";
-        document.getElementById('saveBtn').innerHTML = "<i class='fa fa-check'></i> Update Student";
+        document.getElementById('saveBtn').innerHTML = "Update Student";
         document.getElementById('cancelBtn').style.display = 'block';
     }
 
