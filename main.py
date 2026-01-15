@@ -96,4 +96,4 @@ def delete_student(student_id):
 
 if __name__ == '__main__':
     init_db()
-    eel.start('index.html', size=(1200, 800))
+    eel.start('index.html', size=(1200, 800), port=0)
